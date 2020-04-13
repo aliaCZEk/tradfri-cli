@@ -6,6 +6,6 @@ while read -r i; do
   battery=$(echo ${i} | jq '.battery')
 
   data=$(echo -e "${data}\ntradfri,name=${name} value=${battery}")
-done <<<$(node devices.js | jq -c '.[] | select ((.modelNumber | contains("remote")) or (.modelNumber | contains("switch"))  or (.modelNumber | contains("blind")))')
+done <<<$(node devices.js | jq -c '.[]' | grep battery | jq -c)
 
 curl -XPOST -s "http://${INFLUXDBIP}:8086/write?db=mydb" --data-binary "${data}"
