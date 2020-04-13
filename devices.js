@@ -1,41 +1,54 @@
-const connection = require( './connection' );
-const delay      = require( 'delay' );
+const connection = require('./connection');
 
-function printDeviceInfo( device ) {
-  switch( device.type ) {
+function printDeviceInfo(device, devices) {
+  let info = {
+    instanceId: device.instanceId,
+    name: device.name,
+    modelNumber: device.deviceInfo.modelNumber,
+  };
+
+  switch (device.type) {
     case 0: // remote
     case 4: // sensor
-      console.log( device.instanceId, device.name, `battery ${device.deviceInfo.battery}%` )
+    case 7: // roller-blind
+      info.battery = device.deviceInfo.battery;
+      devices.push(info);
+
       break;
     case 2: // light
-      let lightInfo = device.lightList[0]
-      let info = {
-        onOff: lightInfo.onOff,
-        spectrum: lightInfo.spectrum,
-        dimmer: lightInfo.dimmer,
-        color: lightInfo.color,
-        colorTemperature: lightInfo.colorTemperature
-      }
-      console.log( device.instanceId, device.name, lightInfo.onOff ? "On" : "Off", JSON.stringify( info) )
+      let lightInfo = device.lightList[0];
+      info.onOff = lightInfo.onOff;
+      info.spectrum = lightInfo.spectrum;
+      info.dimmer = lightInfo.dimmer;
+      info.color = lightInfo.color;
+      info.colorTemperature = lightInfo.colorTemperature;
+      devices.push(info);
+
       break;
     case 3: // plug
-      console.log( device.instanceId, device.name, device.plugList[0].onOff ? "On" : "Off" )
+      info.inOff = device.plugList[0].onOff;
+      devices.push(info);
+
+      break;
+    case 6: // signal repeater
+      devices.push(info);
+
       break;
     default:
-      console.log( device.instanceId, device.name, "unknown type", device.type)
-      console.log( device )
+      console.log(device.instanceId, device.name, "unknown type", device.type);
+      console.log(device)
   }
 }
 
-function findDevice( tradfri, deviceNameOrId ) {
+function findDevice(tradfri, deviceNameOrId) {
   let lowerName = deviceNameOrId.toLowerCase();
 
-  for( const deviceId in tradfri.devices ) {
-    if( deviceId === deviceNameOrId ) {
+  for (const deviceId in tradfri.devices) {
+    if (deviceId === deviceNameOrId) {
       return tradfri.devices[deviceId];
     }
 
-    if( tradfri.devices[deviceId].name.toLowerCase() === lowerName ) {
+    if (tradfri.devices[deviceId].name.toLowerCase() === lowerName) {
       return tradfri.devices[deviceId];
     }
   }
@@ -46,21 +59,22 @@ function findDevice( tradfri, deviceNameOrId ) {
 module.exports = {printDeviceInfo, findDevice};
 
 // Only run this method if invoked with "node devices.js"
-if( __filename === process.argv[1] ) {
+if (__filename === process.argv[1]) {
   (async () => {
     const tradfri = await connection.getConnection();
 
-    tradfri.observeDevices();
+    await tradfri.observeDevices();
 
-    // Wait a second hopefully something will be loaded by then!
-    await delay( 1000 )
+    let devices = [];
 
-    for (const deviceId in tradfri.devices ) {
+    for (const deviceId in tradfri.devices) {
       const device = tradfri.devices[deviceId];
-      printDeviceInfo( device )
+      printDeviceInfo(device, devices)
     }
 
-    tradfri.destroy()
+    console.log(JSON.stringify(devices));
+
+    tradfri.destroy();
     process.exit(0);
   })()
 }
