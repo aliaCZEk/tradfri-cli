@@ -7,25 +7,35 @@ const conf = new Conf();
 const {discoverGateway, TradfriClient} = NodeTradfriClient;
 
 async function getConnection() {
-  // console.log("Looking up IKEA Tradfri gateway on your network");
-  let gateway = await discoverGateway();
+  let tradfriIP = process.env.TRADFRIIP;
+  let tradfriHost = null;
 
-  if (gateway == null) {
-    console.log("No Tradfri gateway found in local network");
-    process.exit(1);
+  if (tradfriIP === "" || tradfriIP === undefined) {
+
+    // console.log("Looking up IKEA Tradfri gateway on your network");
+    let gateway = await discoverGateway();
+
+    if (gateway == null) {
+      console.log("No Tradfri gateway found in local network");
+      process.exit(1);
+    }
+
+    tradfriHost = gateway.host;
+  } else {
+    tradfriHost = tradfriIP;
   }
 
   // console.log("Connecting to", gateway.host);
-  const tradfri = new TradfriClient(gateway.host);
+  const tradfri = new TradfriClient(tradfriHost);
 
   if (!conf.has('security.identity') || !conf.has('security.psk')) {
-    let securityCode = process.env.IKEASECURITY;
+    let securityCode = process.env.TRADFRIKEY;
     if (securityCode === "" || securityCode === undefined) {
       console.log("Please set the IKEASECURITY env variable to the code on the back of the gateway");
       process.exit(1)
     }
 
-    console.log("Getting identity from security code");
+    // console.log("Getting identity from security code");
     const {identity, psk} = await tradfri.authenticate(securityCode);
 
     conf.set('security', {identity, psk})

@@ -1,3 +1,3 @@
-const tradfri = require( 'node-tradfri-client' )
+const tradfri = require('node-tradfri-client');
 
-tradfri.discoverGateway().then( result => console.log( result ) )
+tradfri.discoverGateway().then(result => console.log(result));
