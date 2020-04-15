@@ -13,4 +13,4 @@ RUN \
   apk --no-cache add curl jq nodejs yarn bash && \
   yarn install
 
-CMD ["/bin/bash"]
+CMD ["/bin/bash", "-c", "tail -f /dev/null"]
