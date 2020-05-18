@@ -1,12 +1,12 @@
-import Conf from 'conf';
-import delay from 'delay';
-import NodeTradfriClient from "node-tradfri-client";
-import path from 'path';
+const Conf = require('conf');
+const delay = require('delay');
+const NodeTradfriClient = require("node-tradfri-client");
+const path = require('path');
 
 const conf = new Conf();
 const { discoverGateway, TradfriClient } = NodeTradfriClient;
 
-export async function getConnection() {
+async function getConnection() {
   let tradfriIP = process.env.TRADFRIIP;
   let tradfriHost = null;
 
@@ -47,6 +47,8 @@ export async function getConnection() {
 
   return tradfri;
 }
+
+module.exports = { getConnection: getConnection };
 
 // Only run this method if invoked with "node connection.js"
 if (__filename === process.argv[1]) {

@@ -1,6 +1,6 @@
-import { getConnection } from './connection';
+const connection = require('./connection');
 
-module.exports.printDeviceInfo = (device, devices) => {
+function printDeviceInfo(device, devices) {
   let info = {
     instanceId: device.instanceId,
     name: device.name,
@@ -38,12 +38,30 @@ module.exports.printDeviceInfo = (device, devices) => {
       console.log(device.instanceId, device.name, "unknown type", device.type);
       console.log(device)
   }
-};
+}
+
+function findDevice(tradfri, deviceNameOrId) {
+  let lowerName = deviceNameOrId.toLowerCase();
+
+  for (const deviceId in tradfri.devices) {
+    if (deviceId === deviceNameOrId) {
+      return tradfri.devices[deviceId];
+    }
+
+    if (tradfri.devices[deviceId].name.toLowerCase() === lowerName) {
+      return tradfri.devices[deviceId];
+    }
+  }
+
+  return;
+}
+
+module.exports = { printDeviceInfo, findDevice };
 
 // Only run this method if invoked with "node devices.js"
 if (__filename === process.argv[1]) {
   (async () => {
-    const tradfri = await getConnection();
+    const tradfri = await connection.getConnection();
 
     await tradfri.observeDevices();
 
