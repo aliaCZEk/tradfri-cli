@@ -1,12 +1,12 @@
-const Conf = require('conf');
-const delay = require('delay');
-const NodeTradfriClient = require("node-tradfri-client");
-const path = require('path');
+import Conf from 'conf';
+import delay from 'delay';
+import NodeTradfriClient from "node-tradfri-client";
+import path from 'path';
 
 const conf = new Conf();
-const {discoverGateway, TradfriClient} = NodeTradfriClient;
+const { discoverGateway, TradfriClient } = NodeTradfriClient;
 
-async function getConnection() {
+export async function getConnection() {
   let tradfriIP = process.env.TRADFRIIP;
   let tradfriHost = null;
 
@@ -36,9 +36,9 @@ async function getConnection() {
     }
 
     // console.log("Getting identity from security code");
-    const {identity, psk} = await tradfri.authenticate(securityCode);
+    const { identity, psk } = await tradfri.authenticate(securityCode);
 
-    conf.set('security', {identity, psk})
+    conf.set('security', { identity, psk })
   }
 
   // console.log("Securely connecting to gateway");
@@ -47,8 +47,6 @@ async function getConnection() {
 
   return tradfri;
 }
-
-module.exports = {getConnection: getConnection};
 
 // Only run this method if invoked with "node connection.js"
 if (__filename === process.argv[1]) {
