@@ -6,7 +6,7 @@ import path from 'path';
 const conf = new Conf();
 const { discoverGateway, TradfriClient } = NodeTradfriClient;
 
-export async function getConnection() {
+module.exports.getConnection = async () => {
   let tradfriIP = process.env.TRADFRIIP;
   let tradfriHost = null;
 
@@ -46,7 +46,7 @@ export async function getConnection() {
   await tradfri.connect(conf.get('security.identity'), conf.get('security.psk'));
 
   return tradfri;
-}
+};
 
 // Only run this method if invoked with "node connection.js"
 if (__filename === process.argv[1]) {
