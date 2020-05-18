@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 docker stop tradfri-cli
+docker rm tradfri-cli
 docker run -dit --rm \
   --name tradfri-cli \
   -e TRADFRIKEY=6KfxeJCySh58YEBg \
